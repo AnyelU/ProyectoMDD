@@ -95,30 +95,3 @@ export const msMatches = async (req, res) => {
         res.status(500).json({ message: "Error en el servidor", error: error.message });
     }
 };
-
-
-
-
-
-
-
-
-
-
-
- 
-/*
-export const chareMatches = async (req, res) => {
-    try {
-     await Match.find({ $or: [{ user1: User }, { user2: User }] })
-          .populate('user1', 'username','userphone','email')
-          .populate('user2', 'username','userphone','email')
-        
-              
-
-        } catch (error) {
-            console.error("Error en msMatches: ", error);
-            res.status(500).json({ message: "Error en el servidor", error: error.message });
-        }
-}
-*/
