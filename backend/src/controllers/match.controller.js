@@ -85,8 +85,18 @@ export const getMatches = async (req, res) => {
 export const msMatches = async (req, res) => {
     try {
         if (Match) {
-            const matchedUser = Match.user1._id.equals(req.user._id) ? Match.user2 : Match.user1;//valida si los usuarios an echo match
-            res.status(200).json({ message: `Has hecho match correctamente con el usuario ${matchedUser.username}` });
+            const currentUserIsUser1 = Match.user1._id.equals(req.user._id);
+            const matchedUser = currentUserIsUser1 ? Match.user2 : Match.user1;
+
+            if (Match.matched) {
+                console.log(`Ya has hecho match con el usuario ${matchedUser.username}`);
+            } else {
+                console.log(`Has hecho match correctamente con el usuario ${matchedUser.username}`);
+                Match.matched = true;
+                await Match.save();
+            }
+
+            res.status(200).json({ message: `Has hecho match correctamente` });
         } else {
             res.status(404).json({ message: "No se encontraron matches" });
         }
