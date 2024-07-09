@@ -1,24 +1,98 @@
-> [!TIP]
-> Les recomiendo usar la plantilla, debido a que les ahorrará tiempo al ya tener la implementación del login.
+Agregaciones al codigo
 
-# Template Proyecto Metodología de Desarrollo 👨‍💻
 
-Esta plantilla está diseñada para proporcionar a los estudiantes del curso de Metodología de Desarrollo las bases de un proyecto, incluyendo un backend con una funcionalidad de inicio de sesión básica y un frontend correspondiente.
 
-## Cosas a tener en cuenta 📚
 
-Este proyecto consta de dos componentes principales:
+//--match.controller.js/////////////////////////////////////////////////////////////////
 
-#### Backend 🚀
+export const msMatches = async (req, res) => {
+    try {
+        if (Match) {
+            const currentUserIsUser1 = Match.user1._id.equals(req.user._id);
+            const matchedUser = currentUserIsUser1 ? Match.user2 : Match.user1;
 
-El backend del proyecto proporciona la lógica y la funcionalidad del lado del servidor. Incluye una implementación básica de inicio de sesión. Este inicio de sesión no utiliza tokens para la autenticación. Los estudiantes pueden encontrar más información y acceder al código del backend en el siguiente enlace:
+            if (Match.matched) {
+                console.log(`Ya has hecho match con el usuario ${matchedUser.username}`);
+            } else {
+                console.log(`Has hecho match correctamente con el usuario ${matchedUser.username}`);
+                Match.matched = true;
+                await Match.save();
+            }
 
-- [Backend](./backend/)
+            res.status(200).json({ message: `Has hecho match correctamente` });
+        } else {
+            res.status(404).json({ message: "No se encontraron matches" });
+                Match.matched = true;
+                await Match.save();
+        }
+    } catch (error) {
+        console.error("Error en msMatches: ", error);
+        res.status(500).json({ message: "Error en el servidor", error: error.message });
+    }
+};
+//--user.model.js//////////////////////////////////////////////////////////////////////
+const userSch….
 
-#### Frontend 🚀
+ userphone: {
+      type: String,
+      required: true,
+    },
 
-El frontend del proyecto es la interfaz de usuario con la que interactuan los usuarios finales. Incluye la interfaz de inicio de sesión que se conecta al backend. Los estudiantes pueden acceder al código del frontend y explorar su implementación en el siguiente enlace:
 
-- [Frontend](./frontend)
 
-⌨️ with ❤️ by [@Didudocl](https://github.com/DiegoSalazarJara) & [@Metalcl](https://github.com/Metalcl)
+//--match.routes.js///////////////////////////////////////////////////////////////////
+
+import { getAllMatches, getMatches, msMatches } from "../controllers/match.controller.js";
+
+
+
+//--auth.controller.js////////////////////////////////////////////////////////////////
+
+req.session.user = {
+            username: userFound.username,
+            rut: userFound.rut,
+            userphone: userFound.userphone,
+            email: userFound.email,
+            rolName: userFound.roles[0].name
+        };
+
+const newUser = new User({
+            username: userData.username,
+            email: userData.email,
+            userphone: userData.userphone,
+            rut: userData.rut,
+            password: await User.encryptPassword(userData.password),
+            roles: [userRole._id]
+        });
+        await newUser.save();
+
+        const newAdmin = new User({
+            username: userData.username,
+            email: userData.email,
+            rut: userData.rut,
+            userphone: userData.userphone,
+            password: await User.encryptPassword(userData.password),
+            roles: [adminRole._id]
+        });
+        await newAdmin.save();
+ //--initSetup.js/////////////////////////////////////////////////////////////////////
+
+
+await Promise.all([
+      new User({
+        username: "Nombre Usuario",
+        email: "user@gmail.com",
+        rut: "12345678-9",
+        userphone:"912371263",
+        password: await User.encryptPassword("user123"),
+        roles: user._id,
+      }).save(),
+      new User({
+        username: "Nombre Administrador",
+        email: "admin@gmail.com",
+        rut: "12345678-0",
+        userphone:"912323428",
+        password: await User.encryptPassword("admin123"),
+        roles: admin._id,
+      }).save(),
+    ]);
