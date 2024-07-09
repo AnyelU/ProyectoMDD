@@ -5,18 +5,23 @@
 
 export const msMatches = async (req, res) => {
     try {
-        const matches = await Match.find({
-            $or: [{ user1: req.user._id }, { user2: req.user._id }]
-        }).populate('user1', 'username')
-          .populate('user2', 'username');
+        if (Match) {
+            const currentUserIsUser1 = Match.user1._id.equals(req.user._id);
+            const matchedUser = currentUserIsUser1 ? Match.user2 : Match.user1;
 
-        const match = matches.find(m => m.user1._id.equals(req.user._id) || m.user2._id.equals(req.user._id));
+            if (Match.matched) {
+                console.log(`Ya has hecho match con el usuario ${matchedUser.username}`);
+            } else {
+                console.log(`Has hecho match correctamente con el usuario ${matchedUser.username}`);
+                Match.matched = true;
+                await Match.save();
+            }
 
-        if (match) {
-            const matchedUser = match.user1._id.equals(req.user._id) ? match.user2 : match.user1;
-            res.status(200).json({ message: `Has hecho match correctamente con el usuario ${matchedUser.username}` });
+            res.status(200).json({ message: `Has hecho match correctamente` });
         } else {
             res.status(404).json({ message: "No se encontraron matches" });
+                Match.matched = true;
+                await Match.save();
         }
     } catch (error) {
         console.error("Error en msMatches: ", error);
