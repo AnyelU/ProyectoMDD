@@ -2,7 +2,7 @@
 
 // Se importa el módulo de 'mongoose'
 import mongoose from "mongoose";
-// Se importa bcryptjs para utilizar su método de encriptación y
+// Se importa bcryptjs para utilizar su método de encriptación
 import bcrypt from "bcryptjs";
 
 // Crear la colección de usuarios
@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+    },
+    userphone: {
+      type: String,
+      required: true,
     },
     password: {
       type: String,
@@ -32,10 +36,27 @@ const userSchema = new mongoose.Schema(
         ref: "Role",
       },
     ],
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    dislikes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    matches: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    dislikeCounts: {
+      type: Map,
+      of: Number,
+      default: {}
+    }
   },
   {
     versionKey: false,
-  },
+  }
 );
 
 // Contraseña del usuario encriptada

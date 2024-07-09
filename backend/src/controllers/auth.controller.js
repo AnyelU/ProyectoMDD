@@ -1,5 +1,5 @@
 "use strict";
-// Importa el modelo de datos 'Role'
+
 import Role from "../models/role.model.js";
 // Importa el modelo de datos 'User'
 import User from "../models/user.model.js";
@@ -33,6 +33,7 @@ export async function login(req, res) {
         req.session.user = {
             username: userFound.username,
             rut: userFound.rut,
+            userphone: userFound.userphone,
             email: userFound.email,
             rolName: userFound.roles[0].name
         };
@@ -52,7 +53,13 @@ export async function register(req, res) {
     try {
         const userData = req.body;
 
+        // Verifica que el correo sea institucional
+        if (!userData.email.endsWith('@alumnos.ubiobio.cl')) {
+            return res.status(400).json({ message: "El correo electrónico debe ser institucional (@alumnos.ubiobio.cl)." });
+        }
+
         const existingUser = await User.findOne({ email: userData.email });
+
 
         if (existingUser) {
             return res.status(400).json({ message: "El correo electrónico ya está registrado." });
@@ -67,6 +74,7 @@ export async function register(req, res) {
         const newUser = new User({
             username: userData.username,
             email: userData.email,
+            userphone: userData.userphone,
             rut: userData.rut,
             password: await User.encryptPassword(userData.password),
             roles: [userRole._id]
@@ -82,7 +90,40 @@ export async function register(req, res) {
         res.status(500).json({ message: "Error interno del servidor." });
     }
 }
+export async function registerAdmin(req, res) {
+    try {
+        const userData = req.body;
 
+        const existingUser = await User.findOne({ email: userData.email });
+
+        if (existingUser) {
+            return res.status(400).json({ message: "El correo electrónico ya está registrado." });
+        }
+
+        const adminRole = await Role.findOne({ name: 'administrador' });
+        if (!adminRole) {
+            return res.status(500).json({ message: "Error al asignar el rol de administrador." });
+        }
+
+        const newAdmin = new User({
+            username: userData.username,
+            email: userData.email,
+            rut: userData.rut,
+            userphone: userData.userphone,
+            password: await User.encryptPassword(userData.password),
+            roles: [adminRole._id]
+        });
+        await newAdmin.save();
+
+        res.status(201).json({ 
+            message: "Administrador registrado exitosamente",
+            data: newAdmin
+        });
+    } catch (error) {
+        console.log("Error en auth.controller.js -> registerAdmin():", error);
+        res.status(500).json({ message: "Error interno del servidor." });
+    }
+}
 export async function profile(req, res) {
     try{
 
