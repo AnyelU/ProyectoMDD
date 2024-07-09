@@ -3,9 +3,10 @@
 
 //--match.controller.js/////////////////////////////////////////////////////////////////
 
+// Mensaje a usuarios que han echo Match
 export const msMatches = async (req, res) => {
     try {
-        if (Match) {
+        
             const currentUserIsUser1 = Match.user1._id.equals(req.user._id);
             const matchedUser = currentUserIsUser1 ? Match.user2 : Match.user1;
 
@@ -16,18 +17,13 @@ export const msMatches = async (req, res) => {
                 Match.matched = true;
                 await Match.save();
             }
-
-            res.status(200).json({ message: `Has hecho match correctamente` });
-        } else {
-            res.status(404).json({ message: "No se encontraron matches" });
-                Match.matched = true;
-                await Match.save();
-        }
+        
     } catch (error) {
         console.error("Error en msMatches: ", error);
         res.status(500).json({ message: "Error en el servidor", error: error.message });
     }
 };
+
 //--user.model.js//////////////////////////////////////////////////////////////////////
 const userSch….
 
